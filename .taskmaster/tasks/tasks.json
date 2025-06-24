@@ -1,0 +1,640 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Set up project structure and dependencies",
+        "description": "Initialize the project repository, set up the Go module, and install necessary dependencies.",
+        "details": "1. Initialize a new Git repository\n2. Create a go.mod file with `go mod init github.com/yourusername/ai-git`\n3. Install required dependencies:\n   - github.com/spf13/cobra v1.7.0 for CLI\n   - github.com/charmbracelet/bubbletea v0.24.0 for TUI\n   - github.com/charmbracelet/lipgloss v0.7.1 for styling\n   - gopkg.in/yaml.v3 v3.0.1 for YAML parsing\n   - github.com/go-git/go-git/v5 v5.7.0 for Git operations\n4. Set up a basic project structure:\n   /cmd\n     /root.go\n   /internal\n     /config\n     /git\n     /llm\n     /tui\n   /main.go\n<info added on 2025-06-24T14:25:06.422Z>\n## Implementation Summary:\n1. **Go Installation**: Installed Go 1.24.4 via snap package manager\n2. **Go Module Initialization**: Created go.mod with module name `github.com/yourusername/ai-git`\n3. **Project Structure**: Created complete directory structure:\n   - `/cmd` - CLI commands (root.go with Cobra setup)\n   - `/internal/config` - Configuration management (placeholder)\n   - `/internal/git` - Git operations (placeholder)\n   - `/internal/llm` - AI/LLM service (placeholder)\n   - `/internal/tui` - Terminal UI (placeholder)\n   - `main.go` - Application entry point\n\n4. **Dependencies Installed**:\n   - ✅ github.com/spf13/cobra@v1.7.0 - CLI framework\n   - ✅ github.com/charmbracelet/bubbletea@v0.24.0 - TUI framework\n   - ✅ github.com/charmbracelet/lipgloss@v0.7.1 - Styling\n   - ✅ gopkg.in/yaml.v3@v3.0.1 - YAML parsing\n   - ✅ github.com/go-git/go-git/v5@v5.7.0 - Git operations\n\n5. **Verification**:\n   - ✅ Project builds successfully (`go build -o ai-git .`)\n   - ✅ CLI help command works (`./ai-git --help`)\n   - ✅ All placeholder files created with proper package structure\n   - ✅ Go modules properly managed (`go mod tidy`)\n\n## Next Steps:\n- Ready to proceed with Task 2: Implement Config Manager\n- All foundation dependencies and structure are in place\n- Each internal package has placeholder files with TODO comments for future implementation\n</info added on 2025-06-24T14:25:06.422Z>",
+        "testStrategy": "1. Verify that the go.mod file is created with correct module name\n2. Check that all dependencies are successfully installed\n3. Ensure the project structure is correctly set up",
+        "priority": "high",
+        "dependencies": [],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 2,
+        "title": "Implement Config Manager",
+        "description": "Create a Config Manager to handle reading from and writing to the ~/.ai-git.yaml file.",
+        "details": "1. Create a Config struct in internal/config/config.go:\n```go\ntype Config struct {\n    Models      []string          `yaml:\"models\"`\n    APIKeys     map[string]string `yaml:\"api_keys\"`\n    Temperature float64           `yaml:\"temperature\"`\n    Theme       string            `yaml:\"theme\"`\n    CustomPrompt string           `yaml:\"custom_prompt\"`\n}\n```\n2. Implement functions to read and write this struct to ~/.ai-git.yaml using gopkg.in/yaml.v3\n3. Add validation for config values (e.g., temperature range, valid themes)\n4. Implement a function to get default config values\n5. Create a singleton instance of the config for global access",
+        "testStrategy": "1. Unit test the Config struct marshaling and unmarshaling\n2. Test reading non-existent config file (should return default values)\n3. Test writing and reading a config file\n4. Test validation of config values\n5. Test the singleton instance",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Define Config Manager struct",
+            "description": "Create the struct definition for the Config Manager, including all necessary fields and methods.",
+            "dependencies": [],
+            "details": "Define a struct that will hold configuration data, including fields for all required settings. Add methods for accessing and modifying configuration values.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Implement file I/O operations",
+            "description": "Develop functions to read from and write to configuration files.",
+            "dependencies": [
+              1
+            ],
+            "details": "Create functions to load configuration data from a file into the struct and save the struct data back to a file. Handle potential file system errors and permissions issues.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Add configuration validation",
+            "description": "Implement validation logic to ensure configuration data integrity.",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Develop validation functions to check if the loaded or modified configuration data is valid and consistent. Implement error handling for invalid configurations.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Set up default configuration values",
+            "description": "Define and implement a system for default configuration values.",
+            "dependencies": [
+              1
+            ],
+            "details": "Create a set of default values for all configuration options. Implement logic to use these defaults when a configuration file is not found or when certain values are missing.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Implement singleton pattern for Config Manager",
+            "description": "Ensure that only one instance of the Config Manager exists throughout the application.",
+            "dependencies": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "details": "Implement the singleton pattern to guarantee that only one Config Manager instance is created and used across the entire application. Provide a global access point to this instance.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Develop Git Service for reading diffs",
+        "description": "Implement a Git Service module to interact with Git, focusing on reading staged diffs.",
+        "details": "1. Create internal/git/service.go\n2. Use go-git/v5 to implement a function that reads staged diffs:\n```go\nfunc GetStagedDiff() (string, error) {\n    repo, err := git.PlainOpen(\".\")\n    if err != nil {\n        return \"\", err\n    }\n    worktree, err := repo.Worktree()\n    if err != nil {\n        return \"\", err\n    }\n    status, err := worktree.Status()\n    if err != nil {\n        return \"\", err\n    }\n    // Iterate through status and build diff string\n    // ...\n}\n```\n3. Implement a function to get the diff for the last commit (for --amend functionality)\n4. Add error handling for common Git-related issues (e.g., not in a Git repository, no staged changes)",
+        "testStrategy": "1. Unit test the GetStagedDiff function with mock Git repositories\n2. Test error handling for various Git-related scenarios\n3. Integration test with a real Git repository to ensure accurate diff reading",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement function for reading staged diffs",
+            "description": "Create a function that reads and returns the staged differences in the Git repository",
+            "dependencies": [],
+            "details": "Use the go-git library to access the Git repository and retrieve the staged changes. Implement error handling for common Git-related issues.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Implement function for reading last commit diff",
+            "description": "Develop a function to retrieve and return the differences introduced by the last commit",
+            "dependencies": [],
+            "details": "Utilize go-git to access the repository's commit history and extract the changes from the most recent commit. Include proper error handling for scenarios like empty repositories or access issues.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Implement comprehensive error handling",
+            "description": "Create a robust error handling system for the Git Service",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Design and implement custom error types for various Git-related operations. Ensure all functions in the Git Service properly use this error handling system for consistent error reporting and management.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Integrate go-git library with Git Service",
+            "description": "Ensure seamless integration of the go-git library with the Git Service functions",
+            "dependencies": [
+              1,
+              2,
+              3
+            ],
+            "details": "Refactor the Git Service to fully utilize go-git's capabilities. Implement necessary abstractions to make future updates or potential library changes easier. Ensure all Git operations are performed efficiently using go-git.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Create LLM Service for AI interactions",
+        "description": "Develop a module to manage communication with external AI APIs, focusing on OpenAI's streaming API.",
+        "details": "1. Create internal/llm/service.go\n2. Implement a function to stream commit suggestions:\n```go\nfunc StreamCommitSuggestion(diff string) (<-chan string, <-chan error) {\n    // Initialize channels for tokens and errors\n    tokens := make(chan string)\n    errors := make(chan error)\n    \n    go func() {\n        defer close(tokens)\n        defer close(errors)\n        \n        // Use config to get API key and model\n        config := config.GetConfig()\n        client := openai.NewClient(config.APIKeys[\"openai\"])\n        \n        stream, err := client.CreateChatCompletionStream(\n            context.Background(),\n            openai.ChatCompletionRequest{\n                Model: config.Models[0],\n                Messages: []openai.ChatCompletionMessage{\n                    {\n                        Role:    \"system\",\n                        Content: config.CustomPrompt,\n                    },\n                    {\n                        Role:    \"user\",\n                        Content: diff,\n                    },\n                },\n                Temperature: config.Temperature,\n                Stream:      true,\n            },\n        )\n        \n        if err != nil {\n            errors <- err\n            return\n        }\n        \n        for {\n            response, err := stream.Recv()\n            if errors.Is(err, io.EOF) {\n                return\n            }\n            if err != nil {\n                errors <- err\n                return\n            }\n            tokens <- response.Choices[0].Delta.Content\n        }\n    }()\n    \n    return tokens, errors\n}\n```\n3. Implement error handling and retries for API calls\n4. Add support for multiple AI providers (e.g., Anthropic) based on the config",
+        "testStrategy": "1. Unit test the StreamCommitSuggestion function with mock API responses\n2. Test error handling and retry logic\n3. Integration test with actual API calls (using test API keys)\n4. Test support for multiple AI providers",
+        "priority": "high",
+        "dependencies": [
+          2
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "API Client Setup",
+            "description": "Set up the API client for the LLM service",
+            "dependencies": [],
+            "details": "Create a base API client class that can handle authentication and basic request formatting for LLM providers. Implement methods for initializing the client with API keys and other necessary configurations.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Streaming Implementation",
+            "description": "Implement streaming functionality for LLM responses",
+            "dependencies": [
+              1
+            ],
+            "details": "Develop a streaming mechanism to handle real-time responses from the LLM. This should include setting up appropriate data structures and implementing methods to process and yield partial results as they become available.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Error Handling and Retries",
+            "description": "Implement robust error handling and retry mechanisms",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Create a comprehensive error handling system that can catch and appropriately respond to various types of errors (network issues, API limits, etc.). Implement an intelligent retry mechanism with exponential backoff for transient errors.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Multi-Provider Support",
+            "description": "Extend the LLM service to support multiple AI providers",
+            "dependencies": [
+              1,
+              2,
+              3
+            ],
+            "details": "Refactor the existing implementation to support multiple LLM providers (e.g., OpenAI, Anthropic, Google). Create abstract interfaces and provider-specific implementations to ensure easy integration of new providers in the future.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Configuration Integration",
+            "description": "Integrate the LLM service with the project's configuration system",
+            "dependencies": [
+              1,
+              4
+            ],
+            "details": "Connect the LLM service to the project's configuration management system. Implement methods to dynamically load and update LLM-related settings (API keys, model preferences, etc.) from configuration files or environment variables.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "Implement basic TUI structure",
+        "description": "Create the foundational Terminal User Interface (TUI) using the Bubble Tea framework.",
+        "details": "1. Create internal/tui/model.go\n2. Define the main TUI model struct:\n```go\ntype Model struct {\n    diff        string\n    suggestion  string\n    currentView string\n    spinner     spinner.Model\n    viewport    viewport.Model\n    err         error\n}\n```\n3. Implement the tea.Model interface (Init, Update, View)\n4. Create a two-pane layout using Lip Gloss:\n```go\nfunc (m Model) View() string {\n    diffView := lipgloss.NewStyle().\n        Border(lipgloss.RoundedBorder()).\n        BorderForeground(lipgloss.Color(\"63\")).\n        Padding(1).\n        Render(m.diff)\n\n    suggestionView := lipgloss.NewStyle().\n        Border(lipgloss.RoundedBorder()).\n        BorderForeground(lipgloss.Color(\"63\")).\n        Padding(1).\n        Render(m.suggestion)\n\n    return lipgloss.JoinHorizontal(lipgloss.Left, diffView, suggestionView)\n}\n```\n5. Add a status bar with hotkey information\n6. Implement basic keyboard navigation (tab to switch panes, scroll within panes)",
+        "testStrategy": "1. Unit test the Model struct methods\n2. Test rendering of the TUI layout\n3. Test keyboard navigation and scrolling\n4. Manual testing of the TUI appearance and responsiveness",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Define data model for TUI",
+            "description": "Create the underlying data structures and models that will represent the TUI's state and content.",
+            "dependencies": [],
+            "details": "Define classes or structs for different UI elements, implement data storage for dynamic content, and establish relationships between various components of the TUI.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Design TUI layout",
+            "description": "Plan and structure the visual layout of the TUI, including placement of different sections and components.",
+            "dependencies": [
+              1
+            ],
+            "details": "Create a wireframe or mockup of the TUI layout, determine sizes and positions of UI elements, and ensure proper use of screen real estate.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Implement rendering logic",
+            "description": "Develop the core rendering engine to display the TUI elements on the terminal screen.",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Write functions to draw UI components, handle text wrapping and alignment, manage color and styling, and optimize rendering performance.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Implement keyboard navigation",
+            "description": "Create a system for handling user input and navigating through the TUI using keyboard commands.",
+            "dependencies": [
+              1,
+              2,
+              3
+            ],
+            "details": "Implement key bindings, focus management, scrolling functionality, and interactive elements like buttons or text inputs.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Create status bar",
+            "description": "Design and implement a status bar to display relevant information and notifications.",
+            "dependencies": [
+              1,
+              2,
+              3
+            ],
+            "details": "Develop a component for showing current status, error messages, or other important information at the bottom of the TUI, ensuring it updates dynamically based on application state.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Integrate Git and LLM services with TUI",
+        "description": "Connect the Git and LLM services to the TUI, enabling diff loading and suggestion streaming.",
+        "details": "1. In the TUI's Init method, load the staged diff using the Git service\n2. Implement a method to trigger the LLM service and stream tokens into the suggestion pane:\n```go\nfunc (m *Model) fetchSuggestion() tea.Cmd {\n    return func() tea.Msg {\n        tokens, errors := llm.StreamCommitSuggestion(m.diff)\n        for {\n            select {\n            case token, ok := <-tokens:\n                if !ok {\n                    return suggestionCompleteMsg{}\n                }\n                m.suggestion += token\n                return suggestionUpdateMsg(token)\n            case err, ok := <-errors:\n                if !ok {\n                    return nil\n                }\n                return errMsg{err}\n            }\n        }\n    }\n}\n```\n3. Update the Model's Update method to handle these new message types\n4. Implement error handling for both Git and LLM service failures\n5. Add a loading spinner while waiting for the AI suggestion",
+        "testStrategy": "1. Unit test the fetchSuggestion method\n2. Test error handling for Git and LLM service failures\n3. Integration test the full flow from diff loading to suggestion display\n4. Test the spinner functionality during loading",
+        "priority": "high",
+        "dependencies": [
+          3,
+          4,
+          5
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement diff loading",
+            "description": "Create a function to load and parse diff data from the version control system",
+            "dependencies": [],
+            "details": "Develop a module to fetch diff data, parse it into a suitable format for processing, and handle potential loading errors",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Implement suggestion streaming",
+            "description": "Set up a streaming mechanism to receive and process AI suggestions in real-time",
+            "dependencies": [
+              1
+            ],
+            "details": "Create an API client to connect to the AI service, implement event listeners for incoming suggestions, and manage the stream of data",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Implement error handling",
+            "description": "Develop a robust error handling system for various failure scenarios",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Create error classes, implement try-catch blocks, and design user-friendly error messages for different types of failures (network, parsing, AI service)",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Implement UI updates",
+            "description": "Create functions to update the UI with loaded diff data and streamed suggestions",
+            "dependencies": [
+              1,
+              2,
+              3
+            ],
+            "details": "Develop components to display diff information, render incoming suggestions, and update the UI state based on the integration process",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Implement loading indicator",
+            "description": "Add a loading indicator to provide visual feedback during the integration process",
+            "dependencies": [
+              4
+            ],
+            "details": "Create a reusable loading component, integrate it with the UI update functions, and ensure proper state management for showing/hiding the indicator",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Implement commit functionality",
+        "description": "Add the ability to create a Git commit from within the TUI.",
+        "details": "1. Extend the Git service to include a commit function:\n```go\nfunc Commit(message string) error {\n    cmd := exec.Command(\"git\", \"commit\", \"-m\", message)\n    return cmd.Run()\n}\n```\n2. In the TUI's Update method, handle the 'c' key press:\n```go\ncase \"c\":\n    if m.currentView == \"suggestion\" {\n        return m, tea.Batch(\n            func() tea.Msg {\n                err := git.Commit(m.suggestion)\n                if err != nil {\n                    return errMsg{err}\n                }\n                return commitSuccessMsg{}\n            },\n            tea.Quit,\n        )\n    }\n```\n3. Add appropriate success and error messages to the UI\n4. Implement a confirmation prompt before committing to prevent accidental commits",
+        "testStrategy": "1. Unit test the Commit function in the Git service\n2. Test the TUI's handling of the 'c' key press\n3. Integration test the full commit flow\n4. Test error handling for commit failures",
+        "priority": "medium",
+        "dependencies": [
+          3,
+          6
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement Git service extension for commit",
+            "description": "Extend the Git service to include commit functionality",
+            "dependencies": [],
+            "details": "Add a new method to the Git service that handles the commit operation. This should include staging files, preparing the commit message, and executing the commit command.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Integrate commit functionality into TUI",
+            "description": "Add commit option to the TUI and handle user input",
+            "dependencies": [
+              1
+            ],
+            "details": "Update the TUI to include a commit option in the main menu. Implement the necessary input handling to capture the commit message from the user.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Implement error handling for commit operation",
+            "description": "Add robust error handling for various commit scenarios",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Implement error handling for common commit issues such as no changes to commit, merge conflicts, and permission errors. Provide clear error messages to the user through the TUI.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Add confirmation prompt for commit",
+            "description": "Implement a confirmation prompt before executing the commit",
+            "dependencies": [
+              2
+            ],
+            "details": "Add a confirmation prompt in the TUI that shows the files to be committed and asks for user confirmation before proceeding with the commit operation.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "title": "Add editing functionality to TUI",
+        "description": "Implement the ability to edit the AI-generated commit message within the TUI.",
+        "details": "1. Create a new EditModel struct for the editing mode:\n```go\ntype EditModel struct {\n    textarea textarea.Model\n}\n```\n2. Implement the tea.Model interface for EditModel\n3. In the main TUI's Update method, handle the 'e' key press to switch to edit mode:\n```go\ncase \"e\":\n    if m.currentView == \"suggestion\" {\n        editModel := EditModel{\n            textarea: textarea.New(),\n        }\n        editModel.textarea.SetValue(m.suggestion)\n        return editModel, nil\n    }\n```\n4. In the EditModel's Update method, handle saving changes:\n```go\ncase \"ctrl+s\":\n    m.parent.suggestion = m.textarea.Value()\n    return m.parent, nil\n```\n5. Implement a way to cancel editing and return to the main view\n6. Ensure the edited message is used when committing",
+        "testStrategy": "1. Unit test the EditModel struct\n2. Test entering and exiting edit mode\n3. Test saving changes and canceling edits\n4. Integration test the full edit-then-commit flow",
+        "priority": "medium",
+        "dependencies": [
+          6
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create EditModel",
+            "description": "Design and implement the EditModel to manage the editing state",
+            "dependencies": [],
+            "details": "Define the structure for EditModel, including fields for original content, edited content, and editing mode",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Implement mode switching",
+            "description": "Add functionality to switch between view and edit modes",
+            "dependencies": [
+              1
+            ],
+            "details": "Create methods to toggle between view and edit modes, updating the EditModel accordingly",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Implement text area for editing",
+            "description": "Create a text area component for content editing",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Develop a text area component that displays the editable content and captures user input",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Add save/cancel logic",
+            "description": "Implement functionality to save changes or cancel editing",
+            "dependencies": [
+              1,
+              2,
+              3
+            ],
+            "details": "Create methods to handle saving edited content or discarding changes and reverting to the original content",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Integrate with commit flow",
+            "description": "Connect the editing functionality with the existing commit process",
+            "dependencies": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "details": "Modify the commit flow to incorporate the edited content and ensure proper state management during the commit process",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "title": "Implement model cycling feature",
+        "description": "Add the ability to cycle through different AI models for generating commit messages.",
+        "details": "1. Extend the LLM service to support multiple models:\n```go\nfunc StreamCommitSuggestion(diff string, modelIndex int) (<-chan string, <-chan error) {\n    config := config.GetConfig()\n    model := config.Models[modelIndex % len(config.Models)]\n    // Use the selected model in the API call\n    // ...\n}\n```\n2. Add a currentModelIndex to the main TUI Model struct\n3. In the TUI's Update method, handle left and right arrow key presses:\n```go\ncase \"right\":\n    m.currentModelIndex = (m.currentModelIndex + 1) % len(config.GetConfig().Models)\n    return m, m.fetchSuggestion()\ncase \"left\":\n    m.currentModelIndex = (m.currentModelIndex - 1 + len(config.GetConfig().Models)) % len(config.GetConfig().Models)\n    return m, m.fetchSuggestion()\n```\n4. Update the UI to show the current model name\n5. Implement caching to store suggestions from different models to reduce API calls",
+        "testStrategy": "1. Unit test the model cycling logic\n2. Test the UI updates when cycling through models\n3. Test caching of suggestions\n4. Integration test cycling through all configured models",
+        "priority": "medium",
+        "dependencies": [
+          4,
+          6
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Extend LLM Service for Model Cycling",
+            "description": "Modify the LLM service to support switching between different language models.",
+            "dependencies": [],
+            "details": "Update the LLM service to maintain a list of available models, implement a method to switch between models, and ensure proper error handling for model switching.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Implement TUI State Management for Model Cycling",
+            "description": "Add state management to the TUI to handle model cycling and maintain the current model state.",
+            "dependencies": [
+              1
+            ],
+            "details": "Create a new state variable for the current model, implement state update functions for model switching, and ensure the state is properly propagated through the TUI components.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Update UI Components for Model Cycling",
+            "description": "Modify existing UI components and create new ones to support model cycling functionality.",
+            "dependencies": [
+              2
+            ],
+            "details": "Add a new UI element for model selection, update the chat interface to display the current model, and implement user interactions for switching models.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Implement Caching for Model Cycling",
+            "description": "Develop a caching mechanism to improve performance when switching between models.",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Design and implement a caching strategy to store model states, optimize model loading times, and manage cache invalidation when switching models.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "title": "Implement 'ai-git configure' command",
+        "description": "Create an interactive configuration wizard for setting up ai-git.",
+        "details": "1. Create a new Cobra command for 'configure':\n```go\nvar configureCmd = &cobra.Command{\n    Use:   \"configure\",\n    Short: \"Interactive configuration for ai-git\",\n    Run:   runConfigure,\n}\n```\n2. Implement the runConfigure function using a library like github.com/manifoldco/promptui for interactive prompts:\n```go\nfunc runConfigure(cmd *cobra.Command, args []string) {\n    config := config.GetConfig()\n    \n    // Prompt for OpenAI API key\n    prompt := promptui.Prompt{\n        Label: \"Enter your OpenAI API key\",\n        Mask:  '*',\n    }\n    apiKey, err := prompt.Run()\n    if err != nil {\n        fmt.Printf(\"Prompt failed %v\\n\", err)\n        return\n    }\n    config.APIKeys[\"openai\"] = apiKey\n    \n    // Similar prompts for other configuration options\n    // ...\n    \n    // Save the configuration\n    err = config.Save()\n    if err != nil {\n        fmt.Printf(\"Failed to save configuration: %v\\n\", err)\n        return\n    }\n    fmt.Println(\"Configuration saved successfully!\")\n}\n```\n3. Add prompts for all configurable options (API keys, preferred models, temperature, theme)\n4. Implement validation for user inputs\n5. Add the configure command to the root command in main.go",
+        "testStrategy": "1. Unit test the runConfigure function with mock inputs\n2. Test input validation for each configuration option\n3. Test saving of the configuration file\n4. Manual testing of the interactive experience",
+        "priority": "medium",
+        "dependencies": [
+          2
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 11,
+        "title": "Implement 'ai-git commit --amend' command",
+        "description": "Create a command to amend the last commit with an AI-generated message.",
+        "details": "1. Extend the Git service to get the diff of the last commit:\n```go\nfunc GetLastCommitDiff() (string, error) {\n    cmd := exec.Command(\"git\", \"diff\", \"HEAD~1..HEAD\")\n    output, err := cmd.Output()\n    if err != nil {\n        return \"\", err\n    }\n    return string(output), nil\n}\n```\n2. Create a new Cobra command for 'commit --amend':\n```go\nvar amendCmd = &cobra.Command{\n    Use:   \"commit --amend\",\n    Short: \"Amend the last commit with an AI-generated message\",\n    Run:   runAmend,\n}\n```\n3. Implement the runAmend function:\n```go\nfunc runAmend(cmd *cobra.Command, args []string) {\n    diff, err := git.GetLastCommitDiff()\n    if err != nil {\n        fmt.Printf(\"Failed to get last commit diff: %v\\n\", err)\n        return\n    }\n    \n    suggestion, err := llm.GetCommitSuggestion(diff)\n    if err != nil {\n        fmt.Printf(\"Failed to get commit suggestion: %v\\n\", err)\n        return\n    }\n    \n    err = git.AmendCommit(suggestion)\n    if err != nil {\n        fmt.Printf(\"Failed to amend commit: %v\\n\", err)\n        return\n    }\n    \n    fmt.Println(\"Successfully amended last commit!\")\n}\n```\n4. Add the amend command to the root command in main.go\n5. Implement proper error handling and user feedback",
+        "testStrategy": "1. Unit test the GetLastCommitDiff function\n2. Test the runAmend function with mock Git and LLM services\n3. Integration test the full amend flow with a test repository\n4. Test error handling for various scenarios (e.g., no commits to amend)",
+        "priority": "low",
+        "dependencies": [
+          3,
+          4,
+          7
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement Git service extension",
+            "description": "Extend the Git service to support the amend command functionality",
+            "dependencies": [],
+            "details": "Add methods to the Git service to handle amending commits, including retrieving the last commit message and modifying it",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Set up Cobra command for amend",
+            "description": "Create a new Cobra command for the amend functionality",
+            "dependencies": [
+              1
+            ],
+            "details": "Define the amend command structure, flags, and basic logic using Cobra library",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Integrate LLM for commit message enhancement",
+            "description": "Implement LLM integration to improve the commit message",
+            "dependencies": [
+              2
+            ],
+            "details": "Use the LLM service to analyze and enhance the existing commit message before amending",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Implement error handling and validation",
+            "description": "Add robust error handling and input validation for the amend command",
+            "dependencies": [
+              1,
+              2,
+              3
+            ],
+            "details": "Implement checks for valid Git repository, proper commit history, and handle potential errors during the amend process",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 12,
+        "title": "Implement 'ai-git push' command",
+        "description": "Create a command that combines commit and push operations with AI-generated commit messages.",
+        "details": "1. Create a new Cobra command for 'push':\n```go\nvar pushCmd = &cobra.Command{\n    Use:   \"push\",\n    Short: \"Commit changes with an AI-generated message and push\",\n    Run:   runPush,\n}\n```\n2. Implement the runPush function:\n```go\nfunc runPush(cmd *cobra.Command, args []string) {\n    // Check for uncommitted changes\n    hasChanges, err := git.HasUncommittedChanges()\n    if err != nil {\n        fmt.Printf(\"Failed to check for uncommitted changes: %v\\n\", err)\n        return\n    }\n    \n    if hasChanges {\n        // Run the commit flow\n        err = runCommit(cmd, args)\n        if err != nil {\n            fmt.Printf(\"Failed to commit changes: %v\\n\", err)\n            return\n        }\n    }\n    \n    // Push changes\n    err = git.Push()\n    if err != nil {\n        fmt.Printf(\"Failed to push changes: %v\\n\", err)\n        return\n    }\n    \n    fmt.Println(\"Successfully pushed changes!\")\n}\n```\n3. Add the push command to the root command in main.go\n4. Implement proper error handling and user feedback\n5. Add an option to specify the remote and branch for pushing",
+        "testStrategy": "1. Unit test the runPush function with mock Git service\n2. Test scenarios with and without uncommitted changes\n3. Integration test the full commit-and-push flow with a test repository\n4. Test error handling for various push scenarios (e.g., merge conflicts, network issues)",
+        "priority": "low",
+        "dependencies": [
+          7
+        ],
+        "status": "pending",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "created": "2025-06-24T14:10:15.354Z",
+      "updated": "2025-06-24T14:25:31.092Z",
+      "description": "Tasks for master context"
+    }
+  }
+}

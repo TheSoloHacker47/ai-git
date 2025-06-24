@@ -1,0 +1,109 @@
+{
+	"meta": {
+		"generatedAt": "2025-06-24T14:12:22.554Z",
+		"tasksAnalyzed": 12,
+		"totalTasks": 12,
+		"analysisCount": 12,
+		"thresholdScore": 5,
+		"projectName": "Taskmaster",
+		"usedResearch": true
+	},
+	"complexityAnalysis": [
+		{
+			"taskId": 1,
+			"taskTitle": "Set up project structure and dependencies",
+			"complexityScore": 3,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Break down the project setup into initialization, dependency installation, structure creation, and verification steps.",
+			"reasoning": "This task is relatively straightforward but involves multiple steps. It's a foundational task that sets up the project environment."
+		},
+		{
+			"taskId": 2,
+			"taskTitle": "Implement Config Manager",
+			"complexityScore": 5,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Divide the Config Manager implementation into struct definition, file I/O, validation, default values, and singleton creation.",
+			"reasoning": "This task involves creating a robust configuration system with multiple components and considerations for data integrity and access patterns."
+		},
+		{
+			"taskId": 3,
+			"taskTitle": "Develop Git Service for reading diffs",
+			"complexityScore": 6,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Break down the Git Service into functions for reading staged diffs, reading last commit diff, error handling, and integration with the go-git library.",
+			"reasoning": "Interacting with Git requires understanding of Git internals and proper error handling, increasing the complexity."
+		},
+		{
+			"taskId": 4,
+			"taskTitle": "Create LLM Service for AI interactions",
+			"complexityScore": 7,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Divide the LLM Service into API client setup, streaming implementation, error handling and retries, multi-provider support, and configuration integration.",
+			"reasoning": "This task involves complex asynchronous operations, error handling, and integration with external AI services, making it one of the more challenging components."
+		},
+		{
+			"taskId": 5,
+			"taskTitle": "Implement basic TUI structure",
+			"complexityScore": 6,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Break down the TUI implementation into model definition, layout design, rendering logic, keyboard navigation, and status bar creation.",
+			"reasoning": "Creating a responsive and intuitive TUI requires careful design and implementation of various UI components and user interactions."
+		},
+		{
+			"taskId": 6,
+			"taskTitle": "Integrate Git and LLM services with TUI",
+			"complexityScore": 8,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Divide the integration task into diff loading, suggestion streaming, error handling, UI updates, and loading indicator implementation.",
+			"reasoning": "This task involves complex integration of multiple services and asynchronous operations, requiring careful state management and error handling."
+		},
+		{
+			"taskId": 7,
+			"taskTitle": "Implement commit functionality",
+			"complexityScore": 5,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Break down the commit functionality into Git service extension, TUI integration, error handling, and confirmation prompt implementation.",
+			"reasoning": "While not as complex as some other tasks, this involves critical functionality that interacts with Git and requires careful error handling and user confirmation."
+		},
+		{
+			"taskId": 8,
+			"taskTitle": "Add editing functionality to TUI",
+			"complexityScore": 6,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Divide the editing functionality into EditModel creation, mode switching, text area implementation, save/cancel logic, and integration with commit flow.",
+			"reasoning": "Implementing editing within a TUI requires careful state management and integration with existing components, increasing its complexity."
+		},
+		{
+			"taskId": 9,
+			"taskTitle": "Implement model cycling feature",
+			"complexityScore": 5,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Break down the model cycling feature into LLM service extension, TUI state management, UI updates, and caching implementation.",
+			"reasoning": "This task involves modifying existing components and implementing new functionality, with moderate complexity due to state management and caching considerations."
+		},
+		{
+			"taskId": 10,
+			"taskTitle": "Implement 'ai-git configure' command",
+			"complexityScore": 4,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Divide the configure command implementation into Cobra command setup, interactive prompts, input validation, and configuration saving.",
+			"reasoning": "While not highly complex, this task requires careful user input handling and integration with the configuration system."
+		},
+		{
+			"taskId": 11,
+			"taskTitle": "Implement 'ai-git commit --amend' command",
+			"complexityScore": 5,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Break down the amend command into Git service extension, Cobra command setup, LLM integration, and error handling.",
+			"reasoning": "This task involves integrating multiple components and interacting with Git in a specific way, adding some complexity."
+		},
+		{
+			"taskId": 12,
+			"taskTitle": "Implement 'ai-git push' command",
+			"complexityScore": 4,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Divide the push command into Cobra command setup, uncommitted changes check, commit integration, push implementation, and error handling.",
+			"reasoning": "While building on existing functionality, this task requires careful integration and error handling for a smooth user experience."
+		}
+	]
+}

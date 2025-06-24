@@ -1,0 +1,151 @@
+<context>
+Overview
+Product Name: ai-git - The Smart Commit Assistant
+ai-git is a command-line interface (CLI) tool designed to augment the standard Git workflow with the power of generative AI. It solves a common and persistent problem for software developers: the chore of writing clear, conventional, and contextually-aware commit messages.
+This product is for any developer who uses Git, from individuals and small teams to large enterprises. Its value lies in three key areas:
+Productivity: It transforms a manual, thought-intensive task into a near-instant, interactive experience, saving developers time and mental energy on every commit.
+Codebase Quality: It promotes best practices by default, leading to a cleaner, more readable, and more maintainable Git history for the entire team.
+Developer Experience: It introduces a moment of "interactive delight" into a typically mundane workflow, making a routine task feel powerful and modern.
+Unlike existing tools which are static and non-interactive, ai-git provides a rich, terminal-based user interface (TUI) that keeps the developer in flow and in control.
+Core Features
+1. Interactive Commit Creation
+What it does: Launches a full-screen Terminal User Interface (TUI) that displays the user's staged code changes (the "diff") alongside an AI-generated commit message.
+Why it's important: This is the core differentiator. By presenting the context (the diff) and the suggestion in one view, the user can make an informed decision instantly without switching windows or running other commands.
+How it works: When a user runs ai-git commit, the application reads the staged diff using Git commands, sends it to a configured LLM, and streams the response into one pane of a two-pane TUI built with the Go Charm stack.
+2. Live Editing and Model Cycling
+What it does: Allows the user to edit the AI's suggestion directly within the TUI or cycle through different AI models to get a new suggestion on the fly.
+Why it's important: The AI is an assistant, not a dictator. This feature ensures the developer always has the final say, allowing them to make quick tweaks or get a second opinion from another AI model without ever leaving the interface.
+How it works: Pressing 'e' opens a text editing modal within the TUI. Pressing the arrow keys (←/→) updates the application state to select the next model from the config file and re-triggers the AI suggestion request.
+3. Intelligent Command Workflows
+What it does: Provides smart, compound commands that map to real-world developer workflows, such as ai-git push and ai-git commit --amend.
+Why it's important: It anticipates the user's next action, reducing the number of commands they need to type. This makes the tool feel intuitive and further enhances productivity.
+How it works:
+ai-git push first checks for uncommitted changes. If found, it initiates the ai-git commit flow. Once the commit is successful, it proceeds to run git push.
+ai-git commit --amend gets the diff from the most recent commit (HEAD~1..HEAD) and uses that as the context for generating a new message.
+4. Guided, Interactive Configuration
+What it does: A command, ai-git configure, that walks the user through setting up their API keys and model preferences.
+Why it's important: It drastically lowers the barrier to entry, removing the need for users to manually create and edit configuration files. This provides a polished, professional user experience from the very first interaction.
+How it works: The command presents a series of interactive prompts on the command line. The answers are then used to create or update the ~/.ai-git.yaml file.
+User Experience
+User Personas
+Priya, the Senior Developer: Priya values speed and efficiency. She already follows commit conventions but finds it tedious. ai-git saves her time and lets her focus on her next task. She loves the amend and push workflows.
+Leo, the Junior Developer: Leo is still learning best practices for writing commit messages. ai-git acts as a learning tool, providing him with well-structured examples for his changes, which improves his skills over time.
+Key User Flows
+First-Time Setup Flow:
+User downloads the ai-git binary.
+User runs ai-git configure.
+The app prompts for their OpenAI/Anthropic keys and model preferences.
+The configuration is saved, and the tool is ready to use.
+Core Commit Flow:
+User makes code changes and stages them with git add ..
+User runs ai-git commit.
+The TUI appears instantly. The left pane shows the color-coded diff. The right pane shows a loading spinner.
+The AI suggestion streams into the right pane.
+Happy Path: The user likes the message, presses c. The TUI closes, a success message prints, and the commit is made.
+Edit Path: The user presses e, edits the message in the modal, saves, and the commit is made.
+Regenerate Path: The user presses →, a new suggestion from a different model streams in.
+UI/UX Considerations
+Performance: The TUI must launch instantly (<100ms). All I/O operations (Git commands, API calls) must be asynchronous to prevent the UI from blocking.
+Clarity: The UI will be clean, with clear visual separation between the diff and the suggestion. Hotkeys will be permanently displayed in a status bar.
+Feedback: The application must provide constant feedback: spinners for loading, success messages for completed actions, and clean error modals if a command fails.
+Theming: The tool will support themes via the config file to allow users to match their terminal's color scheme.
+</context>
+<PRD>
+Technical Architecture
+System Components
+CLI Entrypoint (main.go): Parses commands and flags (commit, push, --amend) using the cobra library. It's responsible for orchestrating the different services.
+TUI Manager (Bubble Tea model): The core of the interactive experience. It holds the application state (diff content, suggestion text, current view), handles user input (key presses), and renders the UI via Lip Gloss.
+Git Service: A module responsible for all interactions with Git. It will use a hybrid approach: go-git for reading diffs and exec.Command for writing operations (commit, push) for maximum safety and compatibility.
+LLM Service: A module that manages communication with external AI APIs (e.g., OpenAI, Anthropic). It handles request creation, streaming responses, and API key management. It will expose a simple interface like StreamCommitSuggestion(diff string).
+Config Manager: Handles reading from and writing to the ~/.ai-git.yaml file.
+Data Models
+Config: A Go struct that maps directly to the YAML configuration file (APIKeys, Models, Temperature, Theme).
+TUIModel: The main Bubble Tea struct holding UI state, viewport positions, spinner state, current suggestion, and error messages.
+APIs and Integrations
+External: OpenAI v1/chat/completions API (for streaming), Anthropic Messages API (streaming).
+Internal: The LLM Service will provide a clean Go channel-based interface for the TUI to consume token streams as tea.Msg events.
+Infrastructure Requirements
+No server infrastructure is required.
+A GitHub Repository will be used for source code management.
+GitHub Actions will be used for CI/CD to automatically build and test the Go binary for multiple platforms (Linux, macOS, Windows) and create releases with downloadable artifacts.
+Development Roadmap
+MVP Requirements
+Foundation:
+Implement the Config Manager to load settings from YAML.
+Create the ai-git configure command.
+Implement the Git Service to fetch staged diffs.
+Core Logic:
+Implement the LLM Service to make a streaming API call to OpenAI.
+Engineer a robust initial system prompt for generating commit messages.
+User Interface:
+Build the basic two-pane TUI layout using Bubble Tea and Lip Gloss.
+Integrate the Git and LLM services: TUI should load, get diff, get suggestion, and display it.
+Implement the streaming of tokens into the TUI's suggestion pane.
+Interactivity:
+Implement the commit-on-c key press functionality.
+Implement the edit modal on e key press.
+Implement model cycling on ←/→ key presses.
+Commands:
+Build the primary ai-git commit command.
+Build the ai-git commit --amend variant.
+Build the ai-git push workflow command.
+Future Enhancements (Post-MVP)
+V2: Advanced Functionality:
+Pull Request Generation: Add a hotkey (r) to shell out to gh pr create with an AI-generated body.
+Multi-Commit Suggestions: For large diffs, allow the AI to propose splitting the changes into multiple logical commits.
+Conventional Commits Linting: Validate user edits against the Conventional Commits specification.
+V3: Ecosystem & Polish:
+ai-git log: An AI-powered log summary tool.
+Issue Tracker Integration: Automatically detect ticket IDs (e.g., JIRA, Linear) from the branch name.
+Web Playground: Develop the optional TypeScript-based web UI for prompt engineering and demos.
+Logical Dependency Chain
+Configuration: Build the Config struct and YAML loader. This is required by everything. Create the ai-git configure command to make population easy.
+Git Service (Read-Only): Implement the function to get the staged diff. This provides the primary input for the AI.
+LLM Service (Core): Implement the function to take a diff string and return a stream of tokens from an AI provider. This provides the core value proposition.
+TUI Skeleton & Integration: Create a barebones Bubble Tea TUI that calls the Git and LLM services and prints the streamed response to the screen. This is the first end-to-end "visible" milestone.
+Enhance TUI Interactivity: Build the features that make the TUI powerful: the editor modal (e), commit logic (c), and model cycling (←/→).
+Build Command Variants: With the core TUI working, create the remaining entry points: commit --amend (which just changes the Git command that gets the diff) and push (which wraps the commit flow).
+Finalize and Package: Write documentation and set up the GitHub Actions workflow for building release binaries.
+Risks and Mitigations
+Risk: The TUI becomes complex and hard to manage.
+Mitigation: Adhere strictly to the Bubble Tea architecture (The Elm Architecture). Build UI components atomically and ensure state management is centralized in the main model.
+Risk: AI-generated messages are low quality or inconsistent.
+Mitigation: Invest time in prompt engineering. Make the system prompt customizable in the user's config.yaml to allow for user-led improvement. The model cycling feature is also a direct mitigation.
+Risk: Scope creep from exciting "Future Enhancement" ideas.
+Mitigation: A strict adherence to the defined MVP roadmap. All new feature ideas will be triaged and placed in the "Future Enhancements" backlog, not added to the current development cycle.
+Risk: Reliance on external, non-deterministic AI services.
+Mitigation: The application's design inherently mitigates this by keeping the user in control. The tool is an "assistant," and the edit/regenerate features ensure the user is never blocked by a bad suggestion.
+Appendix
+Competitive Analysis
+The primary open-source alternative is Nutlope/aicommits. Our key differentiators are:
+Interactive TUI: vs. their static, one-shot command.
+Integrated Diff View: vs. their requirement to run git diff separately.
+In-App Editing & Model Cycling: vs. their reliance on external editors or re-running commands.
+Single Binary Distribution (Go): vs. their requirement for a Node.js environment.
+Sample ~/.ai-git.yaml
+Generated yaml
+# ~/.ai-git.yaml
+# Configuration for ai-git, created via the 'ai-git configure' command.
+
+# List of AI models to cycle through with arrow keys.
+# The first model is the default.
+models:
+  - "openai/gpt-3.5-turbo"
+
+# API keys for the respective providers.
+api_keys:
+  openai: "sk-..."
+
+# AI model temperature. Higher is more creative, lower is more deterministic.
+temperature: 0.7
+
+# Visual theme for the TUI.
+# Options: "dark", "light", "dracula"
+theme: "dark"
+
+# A custom system prompt to override the default.
+# Use {diff} as a placeholder for the code changes.
+custom_prompt: "You are a senior software engineer. Write a concise, conventional commit message for the following changes:\n{diff}"
+Use code with caution.
+Yaml
+</PRD>
